@@ -16,11 +16,11 @@ async function handleLogin() {
 		<div class="text-center space-y-6">
 			<div>
 				<h1 class="text-3xl font-bold text-white mb-2">Infra Eye</h1>
-				<p class="text-slate-400">GitOps Dashboard</p>
+				<p class="">GitOps Dashboard</p>
 			</div>
 
 			<div class="space-y-4">
-				<p class="text-slate-300">
+				<p class="">
 					Sign in with your OIDC provider to access the dashboard
 				</p>
 
@@ -29,7 +29,7 @@ async function handleLogin() {
 				</Button>
 			</div>
 
-			<div class="text-xs text-slate-500 pt-4">
+			<div class="text-xs  pt-4">
 				Secure authentication using OpenID Connect
 			</div>
 		</div>

@@ -31,7 +31,7 @@ async function handleLogout() {
         <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
           Infra Eye — GitOps Dashboard
         </h1>
-        <p class="text-sm text-slate-600 mt-1.5">
+        <p class="text-sm  mt-1.5">
           Real-time Kubernetes Flux resources monitoring
         </p>
       </div>
@@ -44,7 +44,7 @@ async function handleLogout() {
         
         {#if session?.user}
           <div class="flex items-center gap-3">
-            <div class="text-sm text-slate-700">
+            <div class="text-sm ">
               <div class="font-medium">{session.user.name || session.user.email}</div>
             </div>
             <Button size="xs" color="alternative" onclick={handleLogout}>

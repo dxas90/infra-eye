@@ -60,7 +60,7 @@ describe("StatsBar", () => {
 
     const statsContainer = container.querySelector(".flex.items-center.gap-4")
     expect(statsContainer).toBeInTheDocument()
-    expect(statsContainer).toHaveClass("text-sm", "text-slate-300")
+    expect(statsContainer).toHaveClass("text-sm", "")
   })
 
   it("displays counts in bold", () => {

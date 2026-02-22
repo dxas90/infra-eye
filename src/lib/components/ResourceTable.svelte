@@ -55,7 +55,7 @@ function handleRowClick(resource: K8sResource) {
 <div class="bg-white border  rounded-lg overflow-hidden">
   <div class="overflow-x-auto">
     <table class="w-full text-sm text-left">
-      <thead class="text-xs text-slate-600 uppercase  border-b ">
+      <thead class="text-xs  uppercase  border-b ">
         <tr>
           <th class="px-6 py-3 font-medium">Kind</th>
           <th class="px-6 py-3 font-medium">Namespace</th>
@@ -72,13 +72,13 @@ function handleRowClick(resource: K8sResource) {
             class="border-b  hover: cursor-pointer transition-colors"
             onclick={() => handleRowClick(resource)}
           >
-            <td class="px-6 py-3 font-medium text-slate-900">
+            <td class="px-6 py-3 font-medium ">
               {resource.kind}
             </td>
-            <td class="px-6 py-3 text-slate-900">
+            <td class="px-6 py-3 ">
               {resource.metadata.namespace || "-"}
             </td>
-            <td class="px-6 py-3 text-slate-900">
+            <td class="px-6 py-3 ">
               {resource.metadata.name}
             </td>
             <td class="px-6 py-3">
@@ -86,7 +86,7 @@ function handleRowClick(resource: K8sResource) {
                 {status}
               </Badge>
             </td>
-            <td class="px-6 py-3 text-slate-500 max-w-md truncate">
+            <td class="px-6 py-3  max-w-md truncate">
               {message}
             </td>
           </tr>

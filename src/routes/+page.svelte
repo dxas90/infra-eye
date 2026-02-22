@@ -167,7 +167,7 @@ function clearFilters() {
 
 					<!-- Resource Table -->
 					{#if $filtered.length === 0}
-						<div class="text-center py-12 text-slate-600">
+						<div class="text-center py-12 ">
 							<p class="text-lg mb-2">No resources found</p>
 							<p class="text-sm">Try adjusting your filters or search query</p>
 						</div>
@@ -177,7 +177,7 @@ function clearFilters() {
 				</TabItem>
 				
 				<TabItem open={activeTab === "topology"} title="Topology Graph" onclick={() => activeTab = "topology"}>
-					<div class="text-center py-12 text-slate-600">
+					<div class="text-center py-12 ">
 						<p class="text-lg mb-2">Topology Graph</p>
 						<p class="text-sm">Coming soon...</p>
 					</div>

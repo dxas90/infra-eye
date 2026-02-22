@@ -5,7 +5,7 @@ export let kindFilter: string
 </script>
 
 <div class="flex items-center justify-center py-20">
-	<div class="text-center text-slate-400">
+	<div class="text-center ">
 		<InfoCircleSolid size="xl" class="mx-auto mb-4" />
 		<p class="text-lg">No resources found</p>
 		<p class="text-sm mt-2">

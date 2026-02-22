@@ -36,8 +36,9 @@ $: statusOptions = statuses.map((s) => ({ value: s, name: s }))
         size="md"
         bind:value={$searchQuery}
       >
-        <!-- @ts-ignore - flowbite-svelte slot typing issue -->
-        <SearchOutline slot="left" class="w-4 h-4" />
+        <svelte:fragment slot="left">
+          <SearchOutline class="w-4 h-4" />
+        </svelte:fragment>
       </Input>
     </div>
 

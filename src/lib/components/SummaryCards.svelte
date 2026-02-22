@@ -115,7 +115,7 @@ function handleStatusClick(status: string) {
       }}
     >
       <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-medium text-slate-700">{kind}s</h3>
+        <h3 class="text-sm font-medium ">{kind}s</h3>
       </div>
       <div class="flex items-center gap-3 text-sm">
         <div
@@ -159,7 +159,7 @@ function handleStatusClick(status: string) {
           <span class="font-semibold">{counts.notReady}</span>
         </div>
         <div
-          class="flex items-center gap-1.5 text-slate-400 hover:text-slate-500 cursor-pointer"
+          class="flex items-center gap-1.5  hover: cursor-pointer"
           onclick={(e) => {
             e.stopPropagation();
             handleKindClick(kind);
@@ -179,7 +179,7 @@ function handleStatusClick(status: string) {
           <span class="font-semibold">{counts.progressing}</span>
         </div>
         <div
-          class="flex items-center gap-1.5 text-slate-400 hover:text-slate-500 cursor-pointer"
+          class="flex items-center gap-1.5  hover: cursor-pointer"
           onclick={(e) => {
             e.stopPropagation();
             handleKindClick(kind);

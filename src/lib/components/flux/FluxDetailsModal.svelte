@@ -31,14 +31,15 @@ const lastReconcile = formatTime(
 </script>
 
 <Modal bind:open size="lg" class="">
-	<!-- @ts-ignore - flowbite-svelte slot typing issue -->
-	<div slot="header" class="flex items-center gap-2">
-		<CodeOutline size="sm" />
-		<span>{resource.metadata.name}</span>
-		<Badge color={isReady ? "green" : "red"} class="text-xs">
-			{isReady ? "Ready" : "Not Ready"}
-		</Badge>
-	</div>
+	<svelte:fragment slot="header">
+		<div class="flex items-center gap-2">
+			<CodeOutline size="sm" />
+			<span>{resource.metadata.name}</span>
+			<Badge color={isReady ? "green" : "red"} class="text-xs">
+				{isReady ? "Ready" : "Not Ready"}
+			</Badge>
+		</div>
+	</svelte:fragment>
 
 	<div class="space-y-4">
 		<!-- Metadata -->

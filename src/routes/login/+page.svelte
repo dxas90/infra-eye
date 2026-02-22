@@ -11,8 +11,8 @@ async function handleLogin() {
 	<title>Login - Infra Eye</title>
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-	<Card class="w-full max-w-md bg-slate-900">
+<div class="min-h-screen flex items-center justify-center  p-4">
+	<Card class="w-full max-w-md ">
 		<div class="text-center space-y-6">
 			<div>
 				<h1 class="text-3xl font-bold text-white mb-2">Infra Eye</h1>

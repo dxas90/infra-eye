@@ -1,7 +1,7 @@
 <script lang="ts">
-import type { K8sResource } from "$lib/stores/k8s-resources";
-import { Badge } from "flowbite-svelte";
-import { ClockOutline } from "flowbite-svelte-icons";
+import type { K8sResource } from "$lib/stores/k8s-resources"
+import { Badge } from "flowbite-svelte"
+import { ClockOutline } from "flowbite-svelte-icons"
 
 export let resource: K8sResource
 export let onClick: () => void
@@ -52,35 +52,35 @@ const lastReconcile = formatTime(
 
 <button
 	type="button"
-	class="w-full bg-linear-to-br from-slate-900 to-slate-900/95 p-4 rounded-xl border border-slate-800 shadow-lg shadow-slate-950/50 hover:shadow-xl hover:shadow-blue-500/10 hover:border-slate-700 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] text-left group"
+	class="w-full p-4 rounded-xl border shadow-lg transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] text-left group"
 	on:click={onClick}
 >
 	<!-- Header -->
 	<div class="flex items-start justify-between gap-2 mb-3">
 		<div class="flex-1 min-w-0">
-			<h3 class="text-sm font-semibold truncate text-white group-hover:text-blue-400 transition-colors" title={resource.metadata.name}>
+			<h3 class="text-sm font-semibold truncate transition-colors" title={resource.metadata.name}>
 				{resource.metadata.name}
 			</h3>
-			<div class="text-xs text-slate-400 mt-1 font-medium">
+			<div class="text-xs mt-1 font-medium">
 				{resource.kind}
 			</div>
 		</div>
 
-		<Badge color={statusVariant(isReady)} class="text-xs shrink-0 shadow-sm">
+		<Badge class="text-xs shrink-0 shadow-sm">
 			{isReady ? "✓" : "!"}
 		</Badge>
 	</div>
 
   {#if resource.spec?.suspend}
     <div class="mt-2">
-      <span class="inline-block text-xs text-amber-300 bg-amber-900/30 px-2 py-0.5 rounded-full font-medium">Suspended</span>
+      <span class="inline-block text-xs px-2 py-0.5 rounded-full font-medium">Suspended</span>
     </div>
   {/if}
 
 	<!-- Footer -->
-	<div class="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800/60">
+	<div class="flex items-center justify-between text-xs mt-3 pt-3 border-t">
 		<span class="truncate font-medium">{resource.metadata.namespace || "default"}</span>
-		<div class="flex items-center gap-1.5 shrink-0 text-slate-500">
+		<div class="flex items-center gap-1.5 shrink-0">
 			<ClockOutline size="xs" />
 			<span>{lastReconcile}</span>
 		</div>

@@ -1,30 +1,30 @@
 <script lang="ts">
-import ConnectionStatus from "$lib/components/ConnectionStatus.svelte";
-import { Button } from "flowbite-svelte";
-import { ArrowRightToBracketOutline } from "flowbite-svelte-icons";
-import { signOut } from "@auth/sveltekit/client";
+import ConnectionStatus from "$lib/components/ConnectionStatus.svelte"
+import { signOut } from "@auth/sveltekit/client"
+import { Button } from "flowbite-svelte"
+import { ArrowRightToBracketOutline } from "flowbite-svelte-icons"
 
 interface Props {
   connectionStatus: {
-    status: "connecting" | "connected" | "disconnected" | "error";
-    errors: (string | null)[];
-  };
+    status: "connecting" | "connected" | "disconnected" | "error"
+    errors: (string | null)[]
+  }
   session?: {
     user?: {
-      name?: string | null;
-      email?: string | null;
-    };
-  } | null;
+      name?: string | null
+      email?: string | null
+    }
+  } | null
 }
 
-let { connectionStatus, session }: Props = $props();
+let { connectionStatus, session }: Props = $props()
 
 async function handleLogout() {
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirectTo: "/login" })
 }
 </script>
 
-<header class="sticky top-0 z-50 px-6 py-5 border-b border-slate-200 bg-white">
+<header class="sticky top-0 z-50 px-6 py-5 border-b  bg-white">
   <div class="max-w-7xl mx-auto">
     <div class="flex items-center justify-between">
       <div>
@@ -47,7 +47,7 @@ async function handleLogout() {
             <div class="text-sm text-slate-700">
               <div class="font-medium">{session.user.name || session.user.email}</div>
             </div>
-            <Button size="xs" color="alternative" on:click={handleLogout}>
+            <Button size="xs" color="alternative" onclick={handleLogout}>
               <ArrowRightToBracketOutline size="xs" class="mr-1" />
               Logout
             </Button>

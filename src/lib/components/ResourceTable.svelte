@@ -1,30 +1,43 @@
 <script lang="ts">
-import type { K8sResource } from "$lib/stores/k8s-resources"
-import { Badge } from "flowbite-svelte"
-import FluxDetailsModal from "$lib/components/flux/FluxDetailsModal.svelte"
+import FluxDetailsModal from "$lib/components/flux/FluxDetailsModal.svelte";
+import type { K8sResource } from "$lib/stores/k8s-resources";
+import { Badge } from "flowbite-svelte";
 
 export let resources: K8sResource[]
 
 let selectedResource: K8sResource | null = null
 let showModal = false
 
-function getResourceStatus(resource: K8sResource): { status: string, color: string, customClass?: string } {
+function getResourceStatus(resource: K8sResource): {
+  status: string
+  color?: "red" | "green" | "yellow" | "blue" | "indigo" | "purple" | "pink"
+  customClass?: string
+} {
   const conditions = resource.status?.conditions || []
   const readyCondition = conditions.find((c: any) => c.type === "Ready")
-  
+
   if (resource.spec?.suspend === true) {
-    return { status: "Suspended", color: "none", customClass: "bg-slate-100 text-slate-700" }
+    return {
+      status: "Suspended",
+      customClass: " text-slate-700"
+    }
   }
-  
+
   if (readyCondition?.status === "True") {
-    return { status: "Ready", color: "none", customClass: "bg-black text-white" }
+    return {
+      status: "Ready",
+      customClass: "bg-black text-white"
+    }
   }
-  
+
   if (readyCondition?.status === "False") {
     return { status: "NotReady", color: "red" }
   }
-  
-  return { status: "Progressing", color: "none", customClass: "bg-amber-50 text-amber-900" }
+
+  return {
+    status: "Progressing",
+    customClass: "bg-amber-50 text-amber-900"
+  }
 }
 
 function getStatusMessage(resource: K8sResource): string {
@@ -39,10 +52,10 @@ function handleRowClick(resource: K8sResource) {
 }
 </script>
 
-<div class="bg-white border border-slate-200 rounded-lg overflow-hidden">
+<div class="bg-white border  rounded-lg overflow-hidden">
   <div class="overflow-x-auto">
     <table class="w-full text-sm text-left">
-      <thead class="text-xs text-slate-600 uppercase bg-slate-50 border-b border-slate-200">
+      <thead class="text-xs text-slate-600 uppercase  border-b ">
         <tr>
           <th class="px-6 py-3 font-medium">Kind</th>
           <th class="px-6 py-3 font-medium">Namespace</th>
@@ -56,8 +69,8 @@ function handleRowClick(resource: K8sResource) {
           {@const { status, color, customClass } = getResourceStatus(resource)}
           {@const message = getStatusMessage(resource)}
           <tr 
-            class="border-b border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors"
-            on:click={() => handleRowClick(resource)}
+            class="border-b  hover: cursor-pointer transition-colors"
+            onclick={() => handleRowClick(resource)}
           >
             <td class="px-6 py-3 font-medium text-slate-900">
               {resource.kind}

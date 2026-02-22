@@ -46,7 +46,7 @@ export function createK8sResourceStore(
     ? `/api/watch/${encodeURIComponent(kind)}?namespace=${namespace}`
     : `/api/watch/${encodeURIComponent(kind)}`
 
-  const { subscribe, _, update } = writable<ResourceStore>({
+  const { subscribe, update } = writable<ResourceStore>({
     resources: new Map(),
     status: "disconnected",
     error: null,

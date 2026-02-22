@@ -1,16 +1,17 @@
 <script lang="ts">
-import DropdownFilters from "$lib/components/DropdownFilters.svelte";
-import EmptyState from "$lib/components/EmptyState.svelte";
-import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
-import ResourceTable from "$lib/components/ResourceTable.svelte";
-import SummaryCards from "$lib/components/SummaryCards.svelte";
-import type { ResourceStore } from "$lib/stores/k8s-resources";
+import Button from "$lib/components/Button.svelte"
+import DropdownFilters from "$lib/components/DropdownFilters.svelte"
+import EmptyState from "$lib/components/EmptyState.svelte"
+import LoadingSpinner from "$lib/components/LoadingSpinner.svelte"
+import ResourceTable from "$lib/components/ResourceTable.svelte"
+import SummaryCards from "$lib/components/SummaryCards.svelte"
+import type { ResourceStore } from "$lib/stores/k8s-resources"
 import {
   createK8sResourceStore,
   type K8sResource
-} from "$lib/stores/k8s-resources";
-import { TabItem, Tabs } from "flowbite-svelte";
-import { derived, writable, type Readable } from "svelte/store";
+} from "$lib/stores/k8s-resources"
+import { TabItem, Tabs } from "flowbite-svelte"
+import { derived, writable, type Readable } from "svelte/store"
 
 let { data } = $props()
 
@@ -19,7 +20,7 @@ const resourceStores: Readable<ResourceStore>[] = [
   createK8sResourceStore("helmreleases.helm.toolkit.fluxcd.io"),
   createK8sResourceStore("kustomizations.kustomize.toolkit.fluxcd.io"),
   createK8sResourceStore("helmcharts.source.toolkit.fluxcd.io"),
-  createK8sResourceStore("helmrepositories.source.toolkit.fluxcd.io"),
+  createK8sResourceStore("helmrepositories.source.toolkit.fluxcd.io")
   //createK8sResourceStore("gitrepositories.source.toolkit.fluxcd.io")
 ]
 
@@ -69,7 +70,7 @@ const namespaces = derived(allResources, ($all) => {
 function getResourceStatus(resource: K8sResource): string {
   const conditions = resource.status?.conditions || []
   const readyCondition = conditions.find((c: any) => c.type === "Ready")
-  
+
   if (resource.spec?.suspend === true) return "Suspended"
   if (readyCondition?.status === "True") return "Ready"
   if (readyCondition?.status === "False") return "NotReady"
@@ -114,6 +115,14 @@ const filtered = derived(
 
 // Active tab
 let activeTab = $state("resources")
+
+// Clear all filters
+function clearFilters() {
+  kindFilter.set("all")
+  namespaceFilter.set("all")
+  statusFilter.set("All statuses")
+  searchQuery.set("")
+}
 </script>
 
 <svelte:head>
@@ -149,6 +158,11 @@ let activeTab = $state("resources")
 							{statusFilter}
 							{searchQuery}
 						/>
+						<div class="mt-3 flex justify-end">
+							<Button variant="secondary" size="sm" onclick={clearFilters}>
+								Clear Filters
+							</Button>
+						</div>
 					</div>
 
 					<!-- Resource Table -->

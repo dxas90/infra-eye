@@ -42,6 +42,7 @@ export let errors: (string | null)[] = []
 			{#each errors as error}
 				{#if error}
 					<Alert color="red" class="mb-2">
+						<!-- @ts-ignore - flowbite-svelte slot typing issue -->
 						<InfoCircleSolid slot="icon" class="w-4 h-4" />
 						{error}
 					</Alert>

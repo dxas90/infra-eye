@@ -71,6 +71,12 @@ const lastReconcile = formatTime(
 		</Badge>
 	</div>
 
+  {#if resource.spec?.suspend}
+    <div class="mt-2">
+      <span class="inline-block text-xs text-amber-300 bg-amber-900/30 px-2 py-0.5 rounded-full font-medium">Suspended</span>
+    </div>
+  {/if}
+
 	<!-- Footer -->
 	<div class="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800/60">
 		<span class="truncate font-medium">{resource.metadata.namespace || "default"}</span>

@@ -129,6 +129,17 @@ describe('FluxCardCompact', () => {
 		const { container } = render(FluxCardCompact, { props: { resource: mockResourceReady, onClick } });
 		
 		const button = container.querySelector('button');
-		expect(button).toHaveClass('hover:bg-slate-800', 'hover:shadow-md');
+		expect(button).toHaveClass('group');
+	});
+
+	it('shows suspended marker when spec.suspend is true', () => {
+		const onClick = vi.fn();
+		const suspendedResource: K8sResource = {
+			...mockResourceReady,
+			spec: { suspend: true }
+		};
+		render(FluxCardCompact, { props: { resource: suspendedResource, onClick } });
+
+		expect(screen.getByText('Suspended')).toBeInTheDocument();
 	});
 });

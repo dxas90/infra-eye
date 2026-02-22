@@ -52,7 +52,7 @@ const lastReconcile = formatTime(
 
 <button
 	type="button"
-	class="w-full bg-gradient-to-br from-slate-900 to-slate-900/95 p-4 rounded-xl border border-slate-800 shadow-lg shadow-slate-950/50 hover:shadow-xl hover:shadow-blue-500/10 hover:border-slate-700 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] text-left group"
+	class="w-full bg-linear-to-br from-slate-900 to-slate-900/95 p-4 rounded-xl border border-slate-800 shadow-lg shadow-slate-950/50 hover:shadow-xl hover:shadow-blue-500/10 hover:border-slate-700 transition-all duration-200 cursor-pointer hover:-translate-y-0.5 active:scale-[0.98] text-left group"
 	on:click={onClick}
 >
 	<!-- Header -->
@@ -66,7 +66,7 @@ const lastReconcile = formatTime(
 			</div>
 		</div>
 
-		<Badge color={statusVariant(isReady)} class="text-xs flex-shrink-0 shadow-sm">
+		<Badge color={statusVariant(isReady)} class="text-xs shrink-0 shadow-sm">
 			{isReady ? "✓" : "!"}
 		</Badge>
 	</div>
@@ -80,7 +80,7 @@ const lastReconcile = formatTime(
 	<!-- Footer -->
 	<div class="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-slate-800/60">
 		<span class="truncate font-medium">{resource.metadata.namespace || "default"}</span>
-		<div class="flex items-center gap-1.5 flex-shrink-0 text-slate-500">
+		<div class="flex items-center gap-1.5 shrink-0 text-slate-500">
 			<ClockOutline size="xs" />
 			<span>{lastReconcile}</span>
 		</div>

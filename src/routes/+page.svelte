@@ -1,31 +1,26 @@
 <script lang="ts">
-import FluxCard from "$lib/FluxCard.svelte";
-import ConnectionStatus from "$lib/components/ConnectionStatus.svelte";
+import DropdownFilters from "$lib/components/DropdownFilters.svelte";
 import EmptyState from "$lib/components/EmptyState.svelte";
-import FilterBar from "$lib/components/FilterBar.svelte";
 import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+import ResourceTable from "$lib/components/ResourceTable.svelte";
+import SummaryCards from "$lib/components/SummaryCards.svelte";
 import type { ResourceStore } from "$lib/stores/k8s-resources";
 import {
   createK8sResourceStore,
   type K8sResource
 } from "$lib/stores/k8s-resources";
-import { signOut } from "@auth/sveltekit/client";
-import { Button } from "flowbite-svelte";
-import { ArrowRightToBracketOutline } from "flowbite-svelte-icons";
+import { TabItem, Tabs } from "flowbite-svelte";
 import { derived, writable, type Readable } from "svelte/store";
 
 let { data } = $props()
-
-async function handleLogout() {
-  await signOut({ redirectTo: "/login" })
-}
 
 // Configure which resources to watch
 const resourceStores: Readable<ResourceStore>[] = [
   createK8sResourceStore("helmreleases.helm.toolkit.fluxcd.io"),
   createK8sResourceStore("kustomizations.kustomize.toolkit.fluxcd.io"),
-  createK8sResourceStore("ocirepositories.source.toolkit.fluxcd.io")
-  // createK8sResourceStore("gitrepositories.source.toolkit.fluxcd.io")
+  createK8sResourceStore("helmcharts.source.toolkit.fluxcd.io"),
+  createK8sResourceStore("helmrepositories.source.toolkit.fluxcd.io"),
+  //createK8sResourceStore("gitrepositories.source.toolkit.fluxcd.io")
 ]
 
 // Combine all resources into a single store
@@ -52,6 +47,9 @@ const connectionStatus = derived(resourceStores, (stores) => {
 
 // Filter state
 const kindFilter = writable("all")
+const namespaceFilter = writable("all")
+const statusFilter = writable("All statuses")
+const searchQuery = writable("")
 
 // Get unique kinds for filter dropdown
 const kinds = derived(allResources, ($all) => {
@@ -59,25 +57,63 @@ const kinds = derived(allResources, ($all) => {
   return ["all", ...Array.from(uniqueKinds).sort()]
 })
 
-// Filtered resources based on selected kind
-const filtered = derived([allResources, kindFilter], ([$all, $kf]) =>
-  $kf === "all" ? $all : $all.filter((r) => r.kind === $kf)
-)
-
-// Resource count by type
-const resourceCounts = derived(allResources, ($all) => {
-  const counts = new Map<string, number>()
-  $all.forEach((r) => {
-    counts.set(r.kind, (counts.get(r.kind) || 0) + 1)
-  })
-  return counts
+// Get unique namespaces for filter dropdown
+const namespaces = derived(allResources, ($all) => {
+  const uniqueNamespaces = new Set(
+    $all.map((r) => r.metadata.namespace).filter(Boolean) as string[]
+  )
+  return ["all", ...Array.from(uniqueNamespaces).sort()]
 })
 
-function resourceKey(r: K8sResource) {
-  return r.metadata.namespace
-    ? `${r.kind}/${r.metadata.namespace}/${r.metadata.name}`
-    : `${r.kind}/${r.metadata.name}`
+// Helper to get resource status
+function getResourceStatus(resource: K8sResource): string {
+  const conditions = resource.status?.conditions || []
+  const readyCondition = conditions.find((c: any) => c.type === "Ready")
+  
+  if (resource.spec?.suspend === true) return "Suspended"
+  if (readyCondition?.status === "True") return "Ready"
+  if (readyCondition?.status === "False") return "NotReady"
+  return "Progressing"
 }
+
+// Filtered resources based on all filters
+const filtered = derived(
+  [allResources, kindFilter, namespaceFilter, statusFilter, searchQuery],
+  ([$all, $kf, $nf, $sf, $sq]) => {
+    let result = $all
+
+    // Filter by kind
+    if ($kf !== "all") {
+      result = result.filter((r) => r.kind === $kf)
+    }
+
+    // Filter by namespace
+    if ($nf !== "all") {
+      result = result.filter((r) => r.metadata.namespace === $nf)
+    }
+
+    // Filter by status
+    if ($sf !== "All statuses") {
+      result = result.filter((r) => getResourceStatus(r) === $sf)
+    }
+
+    // Filter by search query
+    if ($sq.trim()) {
+      const query = $sq.toLowerCase()
+      result = result.filter(
+        (r) =>
+          r.metadata.name.toLowerCase().includes(query) ||
+          r.kind.toLowerCase().includes(query) ||
+          r.metadata.namespace?.toLowerCase().includes(query)
+      )
+    }
+
+    return result
+  }
+)
+
+// Active tab
+let activeTab = $state("resources")
 </script>
 
 <svelte:head>
@@ -85,60 +121,54 @@ function resourceKey(r: K8sResource) {
 	<meta name="description" content="Real-time GitOps dashboard for Flux resources" />
 </svelte:head>
 
-<header class="px-6 py-5 border-b border-slate-800/60 bg-slate-900/50 backdrop-blur-sm">
-	<div class="max-w-7xl mx-auto">
-		<div class="flex items-center justify-between">
-			<div>
-				<h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-					Infra Eye — GitOps Dashboard
-				</h1>
-				<p class="text-sm text-slate-400 mt-1.5">
-					Real-time Kubernetes Flux resources monitoring
-				</p>
-			</div>
+<!-- AppHeader removed to match target.jpg layout -->
+<!-- <AppHeader connectionStatus={$connectionStatus} session={data.session} /> -->
 
-			<div class="flex items-center gap-4">
-				<ConnectionStatus
-					status={$connectionStatus.status}
-					errors={$connectionStatus.errors}
-				/>
-				
-				{#if data.session?.user}
-					<div class="flex items-center gap-3">
-						<div class="text-sm text-slate-300">
-							<div class="font-medium">{data.session.user.name || data.session.user.email}</div>
-						</div>
-						<Button size="xs" color="alternative" on:click={handleLogout}>
-							<ArrowRightToBracketOutline size="xs" class="mr-1" />
-							Logout
-						</Button>
-					</div>
-				{/if}
-			</div>
-		</div>
-
-		<!-- Filter Tabs -->
-		<div class="mt-5">
-			<FilterBar
-				kinds={$kinds}
-				{kindFilter}
-				resourceCounts={$resourceCounts}
-				totalCount={$allResources.length}
-			/>
-		</div>
-	</div>
-</header>
-
-<main class="p-6 max-w-7xl mx-auto">
+<main class="px-8 py-6 max-w-7xl mx-auto">
 	{#if $connectionStatus.status === "connecting"}
 		<LoadingSpinner message="Connecting to Kubernetes cluster..." />
-	{:else if $filtered.length === 0}
+	{:else if $allResources.length === 0}
 		<EmptyState kindFilter={$kindFilter} />
 	{:else}
-		<section class="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-			{#each $filtered as r (resourceKey(r))}
-				<FluxCard resource={r} />
-			{/each}
-		</section>
+		<!-- Summary Cards -->
+		<div class="mb-6">
+			<SummaryCards resources={$allResources} {kindFilter} {statusFilter} />
+		</div>
+
+		<!-- Tabs -->
+		<div class="mb-6 bg-white rounded-lg">
+			<Tabs style="underline" class="bg-white">
+				<TabItem open={activeTab === "resources"} title="Resource List" onclick={() => activeTab = "resources"}>
+					<!-- Filters -->
+					<div class="mt-6 mb-6">
+						<DropdownFilters
+							kinds={$kinds}
+							namespaces={$namespaces}
+							{kindFilter}
+							{namespaceFilter}
+							{statusFilter}
+							{searchQuery}
+						/>
+					</div>
+
+					<!-- Resource Table -->
+					{#if $filtered.length === 0}
+						<div class="text-center py-12 text-slate-600">
+							<p class="text-lg mb-2">No resources found</p>
+							<p class="text-sm">Try adjusting your filters or search query</p>
+						</div>
+					{:else}
+						<ResourceTable resources={$filtered} />
+					{/if}
+				</TabItem>
+				
+				<TabItem open={activeTab === "topology"} title="Topology Graph" onclick={() => activeTab = "topology"}>
+					<div class="text-center py-12 text-slate-600">
+						<p class="text-lg mb-2">Topology Graph</p>
+						<p class="text-sm">Coming soon...</p>
+					</div>
+				</TabItem>
+			</Tabs>
+		</div>
 	{/if}
 </main>

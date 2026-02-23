@@ -35,6 +35,6 @@ describe("LoadingSpinner", () => {
     })
 
     const messageElement = screen.getByText("Please wait")
-    expect(messageElement).toHaveClass("")
+    expect(messageElement).toHaveClass("mt-4")
   })
 })

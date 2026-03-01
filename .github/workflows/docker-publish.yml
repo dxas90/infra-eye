@@ -19,7 +19,6 @@ permissions: {}
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   lint:
@@ -100,7 +99,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ steps.repo.outputs.image_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -131,12 +130,12 @@ jobs:
           ## Docker Image Release
 
           \`\`\`bash
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${VERSION}
+            docker pull ${{ env.REGISTRY }}/${{ steps.repo.outputs.image_name }}:${VERSION}
           \`\`\`
 
           ### Available Images
-          - \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${VERSION}\`
-          - \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest\`
+          - \`${{ env.REGISTRY }}/${{ steps.repo.outputs.image_name }}:${VERSION}\`
+          - \`${{ env.REGISTRY }}/${{ steps.repo.outputs.image_name }}:latest\`
 
           ### Supported Platforms
           - linux/amd64

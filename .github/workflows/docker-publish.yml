@@ -124,7 +124,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=${{ steps.semver.outputs.next }}
-          RELEASE_TAG="docker-v${VERSION}"
+          RELEASE_TAG="docker-${VERSION}"
 
           # Create release notes
           cat > release_notes.md << EOF

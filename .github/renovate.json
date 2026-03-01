@@ -4,14 +4,13 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/(^|/)Chart\\.yaml$/"],
+      "fileMatch": ["^chart/.+/Chart\\.yaml$"],
       "matchStrings": [
-        "^appVersion:\\s*\"?(?<currentValue>\\d+\\.\\d+(?:\\.\\d+)?)\"?$",
-        "appVersion:\\s*\"?(?<currentValue>[^$\"]+)\"?"
+        "appVersion:\\s*\"?(?<currentValue>[^\"\\s]+)\"?"
       ],
       "datasourceTemplate": "github-releases",
-      "versioningTemplate": "semver",
-      "depNameTemplate": "infra-eye/chart"
+      "depNameTemplate": "MichaelSp/infra-eye",
+      "extractVersionTemplate": "^v?(?<version>.*)$"
     }
   ]
 }

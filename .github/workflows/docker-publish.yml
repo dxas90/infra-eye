@@ -149,6 +149,6 @@ jobs:
 
           # Create release
           gh release create "${RELEASE_TAG}" \
-            --title "Docker Image v${VERSION}" \
+            --title "Docker Image ${VERSION}" \
             --notes-file release_notes.md \
             --latest

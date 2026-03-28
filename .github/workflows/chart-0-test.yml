@@ -156,7 +156,7 @@ jobs:
         if: steps.changes.outputs.skip != 'true' && steps.semver.outputs.next != steps.semver.outputs.current
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --merge --auto ${{ steps.create_pr.outputs.pull_request_number }}
+        run: gh pr merge --merge --auto ${{ steps.create_pr.outputs.pull-request-number }}
 
   create-tag:
     runs-on: ubuntu-latest

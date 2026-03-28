@@ -74,7 +74,8 @@ jobs:
       - name: Push Helm chart to OCI registry
         run: |
           CHART_VERSION="${{ steps.chart-version.outputs.version }}"
-          CHART_FILE="${{ env.CHART_PATH }##*/}-${CHART_VERSION}.tgz"
+          CHART_NAME=$(basename "${{ env.CHART_PATH }}")
+          CHART_FILE="$CHART_NAME-${CHART_VERSION}.tgz"
 
           if [ -f "$CHART_FILE" ]; then
             OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')

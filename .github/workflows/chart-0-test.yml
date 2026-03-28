@@ -22,6 +22,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 env:
   CHART_PATH: chart/infra-eye
@@ -95,11 +96,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
       - name: Get next version (semver)
         id: semver
         uses: ietf-tools/semver-action@v1
@@ -130,7 +126,7 @@ jobs:
           base: main
           title: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }}"
           body: "Automated Helm chart version bump to ${{ steps.semver.outputs.next }}.\n\nThis PR was created automatically by the release workflow."
-          commit-message: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }} [skip ci]"
+          commit-message: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }}"
           add-paths: |
             ${{ env.CHART_PATH }}/Chart.yaml
           labels: "release, automated-pr"

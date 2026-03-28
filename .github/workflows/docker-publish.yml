@@ -8,6 +8,8 @@ on:
       - "docker-v*.*.*"
     paths-ignore:
       - "chart/**"
+      - ".github/workflows/helm-publish.yml"
+      - ".github/workflows/helm-test.yml"
   pull_request:
     paths-ignore:
       - "chart/**"

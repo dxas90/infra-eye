@@ -12,7 +12,7 @@ env:
   CHART_PATH: chart/infra-eye
 
 jobs:
-  package-and-publish:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -35,30 +35,12 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Determine chart version
-        id: chart-version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/chart-v* ]]; then
-            # Use git tag version (strip 'chart-v' prefix)
-            VERSION="${{ github.ref_name }}"
-            VERSION="${VERSION#chart-v}"
-            CHART_VERSION=$(grep '^version:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
-            if [[ "$VERSION" != "$CHART_VERSION" ]]; then
-              echo "Error: Chart.yaml version ($CHART_VERSION) does not match tag version ($VERSION)." >&2
-              exit 1
-            fi
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "Using tag version: $VERSION"
-          else
-            # Use version from Chart.yaml (no SHA suffix)
-            VERSION=$(grep '^version:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "Using Chart.yaml version: $VERSION"
-          fi
-
-      - name: Package Helm chart
-        run: |
-          helm package ${{ env.CHART_PATH }} --destination .
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          charts_dir: chart
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Log in to Container Registry
         uses: docker/login-action@v4
@@ -69,110 +51,9 @@ jobs:
 
       - name: Push Helm chart to OCI registry
         run: |
-          CHART_VERSION="${{ steps.chart-version.outputs.version }}"
-          CHART_NAME=$(basename "${{ env.CHART_PATH }}")
-          CHART_FILE="$CHART_NAME-${CHART_VERSION}.tgz"
-
-          if [ -f "$CHART_FILE" ]; then
-            OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-            helm push "$CHART_FILE" oci://${{ env.REGISTRY }}/$OWNER_LC/infra-eye
-            echo "Successfully pushed chart version $CHART_VERSION"
-            echo "chart_file=$CHART_FILE" >> $GITHUB_OUTPUT
-          else
-            echo "Error: Chart file not found: $CHART_FILE"
-            ls -la .helm-charts/
-            exit 1
-          fi
-
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION="${{ steps.chart-version.outputs.version }}"
-          RELEASE_TAG="chart-v${VERSION}"
-          CHART_FILE="${{ steps.package-and-publish.outputs.chart_file }}"
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-
-          # Create release notes
-          cat > release_notes.md << EOF
-          ## Helm Chart Release
-
-          ### Installation
-
-          \`\`\`bash
-          # Pull from OCI registry
-          helm pull oci://${{ env.REGISTRY }}/${OWNER_LC}/infra-eye --version ${VERSION}
-
-          # Install
-          helm install infra-eye oci://${{ env.REGISTRY }}/${OWNER_LC}/infra-eye --version ${VERSION}
-          \`\`\`
-
-          ### Chart Information
-          - Version: \`${VERSION}\`
-          - Registry: \`${{ env.REGISTRY }}\`
-          - Repository: \`${{ github.repository }}\`
-
-          ### Build Information
-          - Commit SHA: \`${{ github.sha }}\`
-          - Committed by: @${{ github.actor }}
-          EOF
-
-          # Create release with chart artifact
-          if [ -f "$CHART_FILE" ]; then
-            gh release create "${RELEASE_TAG}" \
-              "${CHART_FILE}" \
-              --title "Helm Chart v${VERSION}" \
-              --notes-file release_notes.md \
-              --latest
-          else
-            echo "Warning: Chart file not found: $CHART_FILE"
-            gh release create "${RELEASE_TAG}" \
-              --title "Helm Chart v${VERSION}" \
-              --notes-file release_notes.md \
-              --latest
-          fi
-
-  publish-pages:
-    runs-on: ubuntu-latest
-    needs: package-and-publish
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v5
-        with:
-          version: "latest"
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Checkout gh-pages branch
-        run: |
-          git fetch origin gh-pages || git checkout --orphan gh-pages
-          git checkout gh-pages || git checkout --orphan gh-pages
-          git reset --hard
-
-      - name: Package Helm chart
-        run: |
-          git checkout main -- ${{ env.CHART_PATH }}
-          helm package ${{ env.CHART_PATH }} --destination .
-
-      - name: Create or update Helm repository index
-        run: |
-          helm repo index . --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-
-      - name: Commit and push to gh-pages
-        run: |
-          git add *.tgz index.yaml
-          git commit -m "Update Helm repository [skip ci]" || echo "No changes to commit"
-          git push origin gh-pages
+          for chart in .cr-release-packages/*.tgz; do
+            [ -f "$chart" ] || continue
+            helm push "$chart" oci://${{ env.REGISTRY }}/$OWNER_LC/infra-eye
+            echo "Pushed $chart"
+          done

@@ -1,4 +1,4 @@
-name: Helm Chart - 2 Publish
+name: Helm Chart - 1 Publish
 
 on:
   push:
@@ -42,10 +42,10 @@ jobs:
       - name: Determine chart version
         id: chart-version
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            # Use git tag version (strip 'v' prefix)
+          if [[ "${{ github.ref }}" == refs/tags/helm-v* ]]; then
+            # Use git tag version (strip 'helm-v' prefix)
             VERSION="${{ github.ref_name }}"
-            VERSION="${VERSION#v}"
+            VERSION="${VERSION#helm-v}"
             CHART_VERSION=$(grep '^version:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
             if [[ "$VERSION" != "$CHART_VERSION" ]]; then
               echo "Error: Chart.yaml version ($CHART_VERSION) does not match tag version ($VERSION)." >&2
@@ -74,7 +74,7 @@ jobs:
       - name: Push Helm chart to OCI registry
         run: |
           CHART_VERSION="${{ steps.chart-version.outputs.version }}"
-          CHART_FILE=".helm-charts/infra-eye-${CHART_VERSION}.tgz"
+          CHART_FILE=".helm-${{ env.CHART_PATH }}-${CHART_VERSION}.tgz"
 
           if [ -f "$CHART_FILE" ]; then
             OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
@@ -93,7 +93,7 @@ jobs:
         run: |
           VERSION="${{ steps.chart-version.outputs.version }}"
           RELEASE_TAG="chart-v${VERSION}"
-          CHART_FILE=".helm-charts/infra-eye-${VERSION}.tgz"
+          CHART_FILE=".helm-${{ env.CHART_PATH }}-${VERSION}.tgz"
 
           # Create release notes
           cat > release_notes.md << EOF

@@ -1,0 +1,67 @@
+name: Helm Chart - Bump and PR
+
+description: |
+    Auto-bump Helm chart version in Chart.yaml using conventional commits 
+    and create a PR to main for Helm releases.
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "chart/**"
+            - ".github/workflows/helm-*.yml"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    bump-and-pr:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: "20"
+
+            - name: Get next version (semver)
+              id: semver
+              uses: ietf-tools/semver-action@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: main
+                  prefix: ""
+                  patchList: fix, chore, docs
+                  noVersionBumpBehavior: current
+                  skipInvalidTags: true
+
+            - name: Commit and push Chart.yaml version bump (PR)
+              id: bumppr
+              run: |
+                  VERSION="${{ steps.semver.outputs.next }}"
+                  BRANCH="chore/chart-bump-v$VERSION"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git checkout -b "$BRANCH"
+                  git add chart/infra-eye/Chart.yaml
+                  git commit -m "chore(release): bump Helm chart version to $VERSION" || echo "No changes to commit"
+                  git push origin "$BRANCH"
+                  echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+            - name: Create PR for version bump
+              uses: peter-evans/create-pull-request@v6
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: ${{ steps.bumppr.outputs.branch }}
+                  base: main
+                  title: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }}"
+                  body: "Automated Helm chart version bump to ${{ steps.semver.outputs.next }}.\n\nThis PR was created automatically by the release workflow."
+                  commit-message: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }} [skip ci]"
+                  labels: "release, automated-pr"
+                  draft: false

@@ -1,0 +1,42 @@
+name: Helm Chart Test, Lint
+
+description: |
+  Lint and test Helm chart.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'chart/**'
+      - '.github/workflows/helm-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CHART_PATH: chart/infra-eye
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: "latest"
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ${{ env.CHART_PATH }}
+
+      - name: Helm template dry-run
+        run: |
+          helm template test-release ${{ env.CHART_PATH }}

@@ -166,6 +166,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
       - name: Get version from Chart.yaml

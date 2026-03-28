@@ -131,3 +131,7 @@ jobs:
             ${{ env.CHART_PATH }}/Chart.yaml
           labels: "release, automated-pr"
           draft: false
+      - name: Automerge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --merge --auto "1"

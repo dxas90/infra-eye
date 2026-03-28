@@ -156,7 +156,7 @@ jobs:
         if: steps.changes.outputs.skip != 'true' && steps.semver.outputs.next != steps.semver.outputs.current
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: gh pr merge --merge --auto ${{ steps.create_pr.outputs.pull-request-number }}
+        run: gh pr merge --squash --auto ${{ steps.create_pr.outputs.pull-request-number }}
 
   create-tag:
     runs-on: ubuntu-latest

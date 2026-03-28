@@ -69,8 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, lint]
     outputs:
-      bumpVersion: ${{ steps.changes.outputs.bumpVersion }}
-      createTag: ${{ steps.changes.outputs.createTag }}
+      bumpVersion: ${{ steps.decision.outputs.bumpVersion }}
+      createTag: ${{ steps.decision.outputs.createTag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -88,15 +88,18 @@ jobs:
 
       - name: Detect if only Chart.yaml changed
         id: changes
+        uses: tj-actions/changed-files@v47
+        with:
+          files: ${{ env.CHART_PATH }}/Chart.yaml
+          files_ignore: ""
+
+      - name: Determine version bump / tag action
+        id: decision
         run: |
-          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "Changed files: $CHANGED"
-          ## if on PR both is false
-          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            echo "On pull request, skipping version bump and tag creation."
+          if [[ "${{ github.event_name }}" == 'pull_request' ]]; then
             echo "bumpVersion=false" >> $GITHUB_OUTPUT
             echo "createTag=false" >> $GITHUB_OUTPUT
-          elif [[ "$CHANGED" == "${{ env.CHART_PATH }}/Chart.yaml" ]]; then
+          elif [[ "${{ steps.changes.outputs.only_changed }}" == "true" ]]; then
             echo "Only Chart.yaml changed. Will create tag but not bump version."
             echo "bumpVersion=false" >> $GITHUB_OUTPUT
             echo "createTag=true" >> $GITHUB_OUTPUT

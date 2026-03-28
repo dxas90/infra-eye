@@ -10,14 +10,14 @@ on:
     paths:
       - "src/**"
       - "chart/**"
-      - ".github/workflows/helm-*.yml"
+      - ".github/workflows/chart-*.yml"
   push:
     branches:
       - main
     paths:
       - "src/**"
       - "chart/**"
-      - ".github/workflows/helm-*.yml"
+      - ".github/workflows/chart-*.yml"
   workflow_dispatch:
 
 permissions:
@@ -69,7 +69,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-          prefix: "helm-"
+          prefix: "chart-"
           patchList: fix, chore, docs
           noVersionBumpBehavior: current
           skipInvalidTags: true

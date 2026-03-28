@@ -3,10 +3,10 @@ name: Helm Chart - 1 Publish
 on:
   push:
     tags:
-      - "helm-v*.*.*"
+      - "chart-v*.*.*"
     paths:
       - "chart/**"
-      - ".github/workflows/helm-*.yml"
+      - ".github/workflows/chart-*.yml"
   workflow_dispatch:
 permissions: {}
 
@@ -42,10 +42,10 @@ jobs:
       - name: Determine chart version
         id: chart-version
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/helm-v* ]]; then
-            # Use git tag version (strip 'helm-v' prefix)
+          if [[ "${{ github.ref }}" == refs/tags/chart-v* ]]; then
+            # Use git tag version (strip 'chart-v' prefix)
             VERSION="${{ github.ref_name }}"
-            VERSION="${VERSION#helm-v}"
+            VERSION="${VERSION#chart-v}"
             CHART_VERSION=$(grep '^version:' ${{ env.CHART_PATH }}/Chart.yaml | awk '{print $2}')
             if [[ "$VERSION" != "$CHART_VERSION" ]]; then
               echo "Error: Chart.yaml version ($CHART_VERSION) does not match tag version ($VERSION)." >&2

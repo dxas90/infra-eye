@@ -8,11 +8,11 @@ on:
       - "docker-v*.*.*"
     paths-ignore:
       - "chart/**"
-      - ".github/workflows/helm-*.yml"
+      - ".github/workflows/chart-*.yml"
   pull_request:
     paths-ignore:
       - "chart/**"
-      - ".github/workflows/helm-*.yml"
+      - ".github/workflows/chart-*.yml"
     branches:
       - main
   workflow_dispatch:

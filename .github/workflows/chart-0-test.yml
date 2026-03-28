@@ -142,7 +142,7 @@ jobs:
         uses: peter-evans/create-pull-request@v8
         id: create_pr
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           branch: chore/bump-${{ steps.semver.outputs.next }}
           base: main
           title: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }}"
@@ -155,7 +155,7 @@ jobs:
       - name: Automerge
         if: steps.changes.outputs.skip != 'true' && steps.semver.outputs.next != steps.semver.outputs.current
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: gh pr merge --merge --auto ${{ steps.create_pr.outputs.pull-request-number }}
 
   create-tag:

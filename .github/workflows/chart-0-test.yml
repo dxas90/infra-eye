@@ -91,11 +91,12 @@ jobs:
         run: |
           CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           echo "Changed files: $CHANGED"
-          ONLY_CHART_CHANGED=[[ "$CHANGED" == "${{ env.CHART_PATH }}/Chart.yaml" ]]
-          if [ "$ONLY_CHART_CHANGED" -eq 0 ]; then
+          if [[ "$CHANGED" == "${{ env.CHART_PATH }}/Chart.yaml" ]]; then
+            echo "Only Chart.yaml changed. Will bump version but not create tag."
             echo "bumpVersion=true" >> $GITHUB_OUTPUT
             echo "createTag=false" >> $GITHUB_OUTPUT
           else
+            echo "Other files changed. Will create tag but not bump version."
             echo "bumpVersion=false" >> $GITHUB_OUTPUT
             echo "createTag=true" >> $GITHUB_OUTPUT
           fi

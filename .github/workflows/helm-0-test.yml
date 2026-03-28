@@ -1,4 +1,4 @@
-name: Helm Chart Test, Lint
+name: Helm Chart - 0 Test and Lint
 
 description: |
   Lint and test Helm chart.

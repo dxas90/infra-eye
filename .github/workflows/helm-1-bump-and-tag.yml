@@ -1,4 +1,4 @@
-name: Helm Chart - Bump and PR
+name: Helm Chart - 1 Bump and PR
 
 description: |
     Auto-bump Helm chart version in Chart.yaml using conventional commits 

@@ -62,7 +62,7 @@ jobs:
 
       - name: Package Helm chart
         run: |
-          helm package ${{ env.CHART_PATH }} --destination .helm-charts
+          helm package ${{ env.CHART_PATH }} --destination .
 
       - name: Log in to Container Registry
         uses: docker/login-action@v4
@@ -74,7 +74,7 @@ jobs:
       - name: Push Helm chart to OCI registry
         run: |
           CHART_VERSION="${{ steps.chart-version.outputs.version }}"
-          CHART_FILE=".helm-${{ env.CHART_PATH }}-${CHART_VERSION}.tgz"
+          CHART_FILE="${{ env.CHART_PATH }##*/}-${CHART_VERSION}.tgz"
 
           if [ -f "$CHART_FILE" ]; then
             OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')

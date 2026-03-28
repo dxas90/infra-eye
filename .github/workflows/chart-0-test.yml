@@ -111,33 +111,27 @@ jobs:
           noVersionBumpBehavior: current
           skipInvalidTags: true
 
-      - name: Commit and push Chart.yaml version bump (PR)
-        id: bumppr
+      - name: Update Chart.yaml version
+        if: steps.semver.outputs.next != steps.semver.outputs.current
         run: |
           VERSION="${{ steps.semver.outputs.next }}"
           PLAIN_VERSION="${VERSION#chart-v}"
-          BRANCH="chore/bump-$VERSION"
 
           # Update Chart.yaml with new version
           yq eval -i ".version = \"$PLAIN_VERSION\"" ${{ env.CHART_PATH }}/Chart.yaml
           cat ${{ env.CHART_PATH }}/Chart.yaml
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add ${{ env.CHART_PATH }}/Chart.yaml
-          git commit -m "chore(release): bump Helm chart version to $VERSION" || echo "No changes to commit"
-          git push origin "$BRANCH"
-          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-
       - name: Create PR for version bump
+        if: steps.semver.outputs.next != steps.semver.outputs.current
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ steps.bumppr.outputs.branch }}
+          branch: chore/bump-${{ steps.semver.outputs.next }}
           base: main
           title: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }}"
           body: "Automated Helm chart version bump to ${{ steps.semver.outputs.next }}.\n\nThis PR was created automatically by the release workflow."
           commit-message: "chore(release): bump Helm chart version to ${{ steps.semver.outputs.next }} [skip ci]"
+          add-paths: |
+            ${{ env.CHART_PATH }}/Chart.yaml
           labels: "release, automated-pr"
           draft: false

@@ -119,6 +119,7 @@ jobs:
 
           # Update Chart.yaml with new version
           yq eval -i ".version = \"$VERSION\"" ${{ env.CHART_PATH }}/Chart.yaml
+          cat ${{ env.CHART_PATH }}/Chart.yaml
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

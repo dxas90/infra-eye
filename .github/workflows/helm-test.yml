@@ -1,4 +1,4 @@
-name: Helm Chart Version Bump and Tag
+name: Helm Chart Test, Lint, Version Bump and Tag
 
 description: |
   Auto-bump Helm chart version in Chart.yaml using conventional commits 
@@ -20,6 +20,9 @@ on:
 
 permissions:
   contents: write
+
+env:
+  CHART_PATH: chart/infra-eye
 
 jobs:
   lint-and-test:
@@ -71,16 +74,16 @@ jobs:
       - name: Update Chart.yaml version
         run: |
           VERSION="${{ steps.semver.outputs.next }}"
-          sed -i "s/^version:.*/version: $VERSION/" chart/infra-eye/Chart.yaml
+          sed -i "s/^version:.*/version: $VERSION/" ${{ env.CHART_PATH }}/Chart.yaml
           echo "Updated Chart.yaml to version $VERSION"
-          cat chart/infra-eye/Chart.yaml
+          cat ${{ env.CHART_PATH }}/Chart.yaml
 
       - name: Commit and push Chart.yaml version bump
         run: |
           VERSION="${{ steps.semver.outputs.next }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add chart/infra-eye/Chart.yaml
+          git add ${{ env.CHART_PATH }}/Chart.yaml
           git commit -m "chore(release): bump Helm chart version to $VERSION [skip ci]" || echo "No changes to commit"
           git push origin main
 

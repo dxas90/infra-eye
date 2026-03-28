@@ -60,15 +60,6 @@ jobs:
             echo "Using Chart.yaml version: $VERSION"
           fi
 
-      # No need to update Chart.yaml version here; it must already match the tag for releases.
-      # Optionally, update appVersion if you want it to track version (uncomment if needed):
-      #- name: Update appVersion (optional)
-      #  run: |
-      #    VERSION="${{ steps.chart-version.outputs.version }}"
-      #    sed -i "s/^appVersion:.*/appVersion: \"$VERSION\"/" ${{ env.CHART_PATH }}/Chart.yaml
-      #    echo "Updated appVersion in Chart.yaml:"
-      #    cat ${{ env.CHART_PATH }}/Chart.yaml
-
       - name: Package Helm chart
         run: |
           helm package ${{ env.CHART_PATH }} --destination .helm-charts

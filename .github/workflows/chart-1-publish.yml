@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - "chart-v*.*.*"
-    paths:
-      - "chart/**"
-      - ".github/workflows/chart-*.yml"
   workflow_dispatch:
 permissions: {}
 

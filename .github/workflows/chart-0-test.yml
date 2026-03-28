@@ -120,6 +120,7 @@ jobs:
       - name: Create PR for version bump
         if: steps.semver.outputs.next != steps.semver.outputs.current
         uses: peter-evans/create-pull-request@v8
+        id: create_pr
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: chore/bump-${{ steps.semver.outputs.next }}
@@ -134,4 +135,4 @@ jobs:
       - name: Automerge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --merge --auto "1"
+        run: gh pr merge --merge --auto ${{ steps.create_pr.outputs.pull_request_number }}

@@ -115,10 +115,11 @@ jobs:
         id: bumppr
         run: |
           VERSION="${{ steps.semver.outputs.next }}"
+          PLAIN_VERSION="${VERSION#chart-v}"
           BRANCH="chore/bump-$VERSION"
 
           # Update Chart.yaml with new version
-          yq eval -i ".version = \"$VERSION\"" ${{ env.CHART_PATH }}/Chart.yaml
+          yq eval -i ".version = \"$PLAIN_VERSION\"" ${{ env.CHART_PATH }}/Chart.yaml
           cat ${{ env.CHART_PATH }}/Chart.yaml
 
           git config user.name "github-actions[bot]"
